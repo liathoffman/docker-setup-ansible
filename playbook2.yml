@@ -15,4 +15,37 @@
         state: present
         force: no
 
+- name: create users named Liat on the nodes
+  hosts: web
+  remote_user: ubuntu
+  become_method: sudo
+  become_user: root
+
+  tasks:
+  - name: create a user called liat
+    user:
+      name: liat
+    become: yes
+
+  - name: copy the private key to the nodes
+    copy:
+      src: ~/new_key_pair
+      dest: ~/new_key_pair
+
+  - name: copy the public key to the nodes
+    copy:
+      src: ~/new_key_pair.pub
+      dest: ~/new_key_pair.pub
+ 
+
+  - name: add public key to authorized_keys
+    authorized_key:
+      user: liat
+      state: present
+      key:  "{{ lookup('file', '~/new_key_pair.pub') }}"
+    become: yes
+      
+      
+    
+
   
