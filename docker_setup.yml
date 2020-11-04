@@ -7,13 +7,6 @@
   
 
   tasks:
-  - name: remove old versions of docker
-    apt:
-      pkg: docker
-      state: absent
-    become: yes
-
-
   - name: install required packages
     apt:
       name: "{{ item }}"
@@ -49,6 +42,16 @@
       name: docker-ce
       state: latest
     become: yes
+    register: result
+    
+  - name: restart docker if changes were made
+    service:
+      name: docker
+      state: started
+    become: true
+    when: result.changed
+
+    
 
   
 
