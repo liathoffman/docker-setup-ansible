@@ -1,0 +1,15 @@
+---
+- name: install docker on nodes
+  hosts: web
+  remote_user: ubuntu
+  become_method: sudo
+  become_user: root
+  
+
+  tasks:
+  - name: install required packages
+    apt:
+      name: "*"
+      state: latest
+    become: yes
+
