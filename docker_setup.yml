@@ -7,10 +7,19 @@
   
 
   tasks:
+  - name: remove old versions of docker
+    apt:
+      pkg: docker
+      state: absent
+    become: yes
+
+
   - name: install required packages
     apt:
-      name: "*"
+      name: "{{ item }}"
       state: latest
+      update_cache: yes
+    loop: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg-agent', 'software-properties-common']
     become: yes
 
   - name: add docker official gpg key
@@ -19,9 +28,19 @@
       state: present
     become: yes
 
+  - name: check fingerprint
+    command: apt-key fingerprint 0EBFCD88
+    register: fingerprint_result
+  
+  - name: print stdout for fingerprint
+    debug:
+      msg: "{{fingerprint_result}}"
+      
+
   - name: add docker apt repo
     apt_repository:
-      repo: deb https://download.docker.com/linux/ubuntu bionic stable
+      repo: deb [arch=amd64] https://download.docker.com/linux/{{ansible_distribution|lower}} {{ansible_distribution_release}} stable
+      state: present
     become: yes
 
   - name: install docker
